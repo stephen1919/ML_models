@@ -1,0 +1,15 @@
+Model Report:
+
+The point of these models is to make statistical forecasting data accessible to where a javascript file can easily extract specific requested data that was generated as a result of the forecasting. Further adjustmants may be necessary if there is a greater demand for more generated statistical data and/or the models need more fine tuning to meet current demands.
+
+So far these models use 4 methods of statistical analysis:
+
+* prophet
+	- this module provides a couple of different statistical approaches in order to make a well rounded forecast for future interval data.
+* ARIMA 
+	- this is being used to accommodate for the inferential advantages that it has over prophet. It also estimates prediction error.
+* SARIMA
+	- if we make sure that our model is congruent with the current data, then it would be safe to assume that the model would be accurate. We want to account for seasonal patterns in the data 
+	  this should do the job just fine.
+
+

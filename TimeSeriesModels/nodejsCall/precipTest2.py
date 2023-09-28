@@ -1,0 +1,109 @@
+##### Prophet section (start) ##########################################################################
+### module imports (start) ##########################################################
+import os
+import sys
+import time
+import random
+import string
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sb 
+from pylab import rcParams
+import scipy
+from scipy.stats import pearsonr
+
+from prophet import Prophet
+import json
+from prophet.plot import plot_plotly, plot_components_plotly
+
+from statsmodels.graphics.tsaplots import plot_pacf, plot_acf
+from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.stattools import adfuller
+#                                       \/
+#                   The Augmented Dickey-Fuller test can be used to test 
+#                   whether a given time series is stationary or not
+from sklearn.metrics import mean_squared_error
+from tqdm import tqdm_notebook
+#                    \/
+#       responsible for displaying the progress bar
+from itertools import product
+
+import warnings
+warnings.filterwarnings('ignore')
+plt.rcParams['figure.figsize'] = [10,10]
+
+### module imports (end) ############################################################
+                                                   
+### calling the csv data (start) ####################################################
+precip1 = pd.read_csv('/Users/stephenshaeffer/Desktop/TXT-CSV/precipitation_station1.csv')
+
+### defining the "m" method ###
+
+m = Prophet()
+m.fit(precip1)
+
+### defining prediction data frames ###
+
+precipDayfuture = m.make_future_dataframe(periods=1)
+
+precipWeekfuture = m.make_future_dataframe(periods=7)
+
+precip2Weekfuture = m.make_future_dataframe(periods=14)
+
+### utilizing prediction data frames ###
+
+precipDayforecast = m.predict(precipDayfuture)
+precipDayforecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+# after generating the forecast data, convert it to JSON
+forecast_data_precipDay = {
+    'ds': precipDayforecast['ds'].dt.strftime('%Y-%m-%d').tolist(),
+    'yhat': precipDayforecast['yhat'].tolist(),
+    'yhat_lower': precipDayforecast['yhat_lower'].tolist(),
+    'yhat_upper': precipDayforecast['yhat_upper'].tolist()
+}
+
+precipWeekforecast = m.predict(precipWeekfuture)
+precipWeekforecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+forecast_data_precipWeek = {
+    'ds': precipWeekforecast['ds'].dt.strftime('%Y-%m-%d').tolist(),
+    'yhat': precipWeekforecast['yhat'].tolist(),
+    'yhat_lower': precipWeekforecast['yhat_lower'].tolist(),
+    'yhat_upper': precipWeekforecast['yhat_upper'].tolist()
+}
+
+precip2Weekforecast = m.predict(precip2Weekfuture)
+precip2Weekforecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']]
+
+forecast_data_precip2Week = {
+    'ds': precip2Weekforecast['ds'].dt.strftime('%Y-%m-%d').tolist(),
+    'yhat': precip2Weekforecast['yhat'].tolist(),
+    'yhat_lower': precip2Weekforecast['yhat_lower'].tolist(),
+    'yhat_upper': precip2Weekforecast['yhat_upper'].tolist()
+}
+
+with open('forecast_data_day.json', 'w') as file:
+    json.dump(forecast_data_precipDay, file)
+
+with open('forecast_data_week.json', 'w') as file:
+    json.dump(forecast_data_precipWeek, file)
+
+with open('forecast_data_2week.json', 'w') as file:
+    json.dump(forecast_data_precip2Week, file)
+### plotting the 24 hour forcasting (start) ##########################################################
+# def graph_1(m, precipDayforecast):
+def graph_1(m, precipDayforecast):
+    return m.plot(precipDayforecast)
+
+def graph_2(m, precipDayforecast):
+    return m.plot_components(precipDayforecast)
+
+def graph_3(m, precipDayforecast):
+    return plot_plotly(m, precipDayforecast)
+
+def graph_4(m, precipDayforecast):
+    return plot_components_plotly(m, precipDayforecast)
+### plotting the 24 hour forcasting (end) ##########################################################

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graph Display</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> <!-- Include Plotly library -->
+</head>
+<body>
+    <h1>Graphs</h1>
+    <button id="dayButton">Generate Day Graph</button>
+    <button id="weekButton">Generate Week Graph</button>
+    <button id="2weekButton">Generate 2-Week Graph</button>
+    <div id="graphs"></div>
+    
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#dayButton").click(function() {
+                var timeframe = "day"; // Set the desired timeframe: 'day'
+                var url = '/generate_graphs?timeframe=' + timeframe;
+        
+                $.get(url, function(data) {
+                    console.log("Received DAY data:", data); // Log received data
+                    var graphData = JSON.parse(data);
+                    console.log("Parsed DAY data:", graphData); // Log parsed data
+                    displayGraphs(graphData);
+                });
+            });
+
+            $("#weekButton").click(function() {
+                var timeframe = "week"; // Set the desired timeframe: 'week'
+                var url = '/generate_graphs?timeframe=' + timeframe;
+        
+                $.get(url, function(data) {
+                    console.log("Received WEEK data:", data); // Log received data
+                    var graphData = JSON.parse(data);
+                    console.log("Parsed WEEK data:", graphData); // Log parsed data
+                    displayGraphs(graphData);
+                });
+            });
+
+            $("#2weekButton").click(function() {
+                var timeframe = "2week"; // Set the desired timeframe: '2week'
+                var url = '/generate_graphs?timeframe=' + timeframe;
+        
+                $.get(url, function(data) {
+                    console.log("Received 2WEEK data:", data); // Log received data
+                    var graphData = JSON.parse(data);
+                    console.log("Parsed 2WEEK data:", data); // Log received data
+                    displayGraphs(graphData);
+                });
+            });
+            
+            function displayGraphs(data) {
+                var graphsDiv = document.getElementById("graphs");
+                graphsDiv.innerHTML = ""; // Clear existing graphs
+                
+                var trace1 = {
+                    x: data.ds,
+                    y: data.yhat,
+                    mode: 'lines',
+                    name: 'yhat'
+                };
+                
+                var trace2 = {
+                    x: data.ds,
+                    y: data.yhat_lower,
+                    mode: 'lines',
+                    name: 'yhat_lower'
+                };
+                
+                var trace3 = {
+                    x: data.ds,
+                    y: data.yhat_upper,
+                    mode: 'lines',
+                    name: 'yhat_upper'
+                };
+                
+                var layout = {
+                    title: 'Forecast Data',
+                    xaxis: {
+                        title: 'Date'
+                    },
+                    yaxis: {
+                        title: 'Value'
+                    }
+                };
+                
+                var graphData = [trace1, trace2, trace3];
+                Plotly.newPlot(graphsDiv, graphData, layout);
+            }
+        });
+    </script>
+</body>
+</html>

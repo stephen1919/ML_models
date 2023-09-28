@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graph Display</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+<body>
+    <h1>Graphs</h1>
+    <button id="generateButton">Generate Graphs</button>
+    <div id="graphs"></div>
+    
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $("#generateButton").click(function() {
+                $.get('/generate_graphs', function(data) {
+                    var graphData = JSON.parse(data);
+                    displayGraphs(graphData);
+                });
+            });
+            
+            function displayGraphs(data) {
+                var graphsDiv = document.getElementById("graphs");
+                graphsDiv.innerHTML = ""; // Clear existing graphs
+                
+                var trace1 = {
+                    x: data.ds,
+                    y: data.yhat,
+                    mode: 'lines',
+                    name: 'yhat'
+                };
+                
+                var trace2 = {
+                    x: data.ds,
+                    y: data.yhat_lower,
+                    mode: 'lines',
+                    name: 'yhat_lower'
+                };
+                
+                var trace3 = {
+                    x: data.ds,
+                    y: data.yhat_upper,
+                    mode: 'lines',
+                    name: 'yhat_upper'
+                };
+                
+                var layout = {
+                    title: 'Forecast Data',
+                    xaxis: {
+                        title: 'Date'
+                    },
+                    yaxis: {
+                        title: 'Value'
+                    }
+                };
+                
+                var graphData = [trace1, trace2, trace3];
+                Plotly.newPlot(graphsDiv, graphData, layout);
+            }
+        });
+    </script>
+</body>
+</html>
